@@ -9,7 +9,7 @@ export async function createBlog(title, content){
 }
 
 export async function getBlogs(){
-    const response = await blogInstnace.get('/get')
+    const response = await blogInstnace.get('/getall')
     return response.data
 }
 
@@ -20,7 +20,7 @@ export async function searchBlogs(query){
     return response.data
 }
 
-export async function updateBlog(id){
+export async function updateBlog(id, title, content){
     const response = await blogInstnace.patch(`/update/${id}`, { title, content })
     return response.data
 }

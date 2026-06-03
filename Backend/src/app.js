@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 app.use(cookieparser())
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://your-frontend-url.vercel.app"],
     credentials: true
 }))
 
@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 })
 
 
-app.use('/api/auth', authRouter)
-app.use('/api/blogs', blogRouter)
+app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/blogs', blogRouter)
 
 module.exports = app
