@@ -99,6 +99,7 @@ async function loginUser(req, res){
          res.cookie("token", token, {
             httpOnly: false,
             sameSite: "lax",
+            secure: true,
             maxAge: 24 * 60 * 60 * 1000
          })
 

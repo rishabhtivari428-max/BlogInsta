@@ -30,7 +30,7 @@ async function createBlog(req, res) {
 
 async function getBlog(req, res) {
     try {
-        const blog = await blogModel.find({ author: req.user._id })
+        const blogs = await blogModel.find({ author: req.user._id })
             .populate('author', 'username avatar')
             .sort({ createdAt: -1 })
 
@@ -42,7 +42,7 @@ async function getBlog(req, res) {
 
         return res.status(200).json({
             message: "Blogs fetched successfully",
-            blog
+            blogs
         })
     } catch(error) {
         res.status(500).json({

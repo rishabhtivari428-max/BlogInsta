@@ -1,11 +1,10 @@
 import axios from 'axios'
 
 const axiosInstance = axios.create({
-    baseURL: "https://blogapp-hxox.onrender.com",
+    baseURL: "https://blogapp-hxox.onrender.com/api/v1/auth",
     withCredentials: true
 })
 
-// Add token to headers if available
 axiosInstance.interceptors.request.use((config) => {
     const token = localStorage.getItem('token')
     if (token) {

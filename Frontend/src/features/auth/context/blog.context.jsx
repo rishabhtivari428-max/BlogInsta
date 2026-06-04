@@ -12,11 +12,10 @@ export function BlogProvider({ children }){
         setloading(true)
         try {
             const response = await getBlogs()
-            setblogs(response.blog || [])
+            setblogs(response.blogs || []) // ✅ correct key
         } catch (error) {
             console.log("Unable to fetch blogs: ", error)
-        }
-        finally{
+        } finally {
             setloading(false)
         }
     }, [])
@@ -36,13 +35,13 @@ export function BlogProvider({ children }){
     }
 
     const removeBlog = async(id) => {
-        const response = await deleteBlog(id)
-        setblogs(prev => prev.filter(b => b._id !== id))
+        await deleteBlog(id)
+        setblogs(prev => prev.filter(b => b._id !== id)) // ✅ update state
     }
 
     useEffect(() => {
-    fetchBlogs()
-}, [fetchBlogs])
+        fetchBlogs()
+    }, [fetchBlogs])
 
     return (
         <blogContext.Provider value={{ blogs, addBlog, editBlog, removeBlog, fetchBlogs, loading }}>

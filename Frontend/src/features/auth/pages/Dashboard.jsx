@@ -2,37 +2,50 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useBlog } from '../hooks/useBlog'
-import { deleteBlog, getBlogs } from '../services/blog.api'
+import { deleteBlog, getBlogs, likeBlog } from '../services/blog.api'
 
 const Dashboard = () => {
     const { user, loading: authLoading } = useAuth()
-    const [blogs, setBlogs] = useState([])
-    const [loading, setLoading] = useState(true)
+    // const [blogs, setBlogs] = useState([])
+    // const [loading, setLoading] = useState(true)
+    const { blogs, fetchBlogs, loading, removeBlog } = useBlog()
     const [activeTab, setActiveTab] = useState('myblogs')
     const [deleteLoading, setDeleteLoading] = useState(null)
 
     useEffect(() => {
-        fetchUserBlogs()
+        fetchBlogs()
     }, [])
 
-    const fetchUserBlogs = async () => {
+
+    const handleLiked = async (id) => {
         try {
-            setLoading(true)
-            const response = await getBlogs()
-            setBlogs(response.blog || [])
+            await likeBlog(id)
         } catch (error) {
-            console.error("Error fetching blogs:", error)
-        } finally {
-            setLoading(false)
+            console.log("Error while liking the blog: ", error)
         }
     }
 
-    const handleDelete = async(id) => {
-        if(window.confirm("Are you sure you want to delete this blog?")) {
+    // useEffect(() => {
+    //     fetchUserBlogs()
+    // }, [])
+
+    // const fetchUserBlogs = async () => {
+    //     try {
+    //         setLoading(true)
+    //         const response = await getBlogs()
+    //         setBlogs(response.blog || [])
+    //     } catch (error) {
+    //         console.error("Error fetching blogs:", error)
+    //     } finally {
+    //         setLoading(false)
+    //     }
+    // }
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this blog?")) {
             setDeleteLoading(id)
             try {
-                await deleteBlog(id)
-                setBlogs(blogs.filter(blog => blog._id !== id))
+                await removeBlog(id)
             } catch (error) {
                 console.error("Error deleting blog:", error)
             } finally {
@@ -41,7 +54,7 @@ const Dashboard = () => {
         }
     }
 
-    if(authLoading || loading){
+    if (authLoading || loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600">
                 <div className="text-center">
@@ -81,7 +94,7 @@ const Dashboard = () => {
                                 <p className="text-gray-600 text-lg">{user.email}</p>
                             </div>
                             <div className="flex gap-3">
-                                <Link 
+                                <Link
                                     to="/create"
                                     className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition transform hover:scale-105"
                                 >
@@ -107,36 +120,31 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Tabs Navigation */}
                 <div className="flex gap-4 mb-8 border-b border-gray-200">
                     <button
                         onClick={() => setActiveTab('myblogs')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${
-                            activeTab === 'myblogs'
-                                ? 'text-indigo-600 border-indigo-600'
-                                : 'text-gray-600 border-transparent hover:text-indigo-600'
-                        }`}
+                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeTab === 'myblogs'
+                            ? 'text-indigo-600 border-indigo-600'
+                            : 'text-gray-600 border-transparent hover:text-indigo-600'
+                            }`}
                     >
                         📝 My Blogs
                     </button>
                     <button
                         onClick={() => setActiveTab('followers')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${
-                            activeTab === 'followers'
-                                ? 'text-indigo-600 border-indigo-600'
-                                : 'text-gray-600 border-transparent hover:text-indigo-600'
-                        }`}
+                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeTab === 'followers'
+                            ? 'text-indigo-600 border-indigo-600'
+                            : 'text-gray-600 border-transparent hover:text-indigo-600'
+                            }`}
                     >
                         👥 Followers
                     </button>
                     <button
                         onClick={() => setActiveTab('following')}
-                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${
-                            activeTab === 'following'
-                                ? 'text-indigo-600 border-indigo-600'
-                                : 'text-gray-600 border-transparent hover:text-indigo-600'
-                        }`}
+                        className={`px-6 py-3 font-semibold transition-all border-b-2 ${activeTab === 'following'
+                            ? 'text-indigo-600 border-indigo-600'
+                            : 'text-gray-600 border-transparent hover:text-indigo-600'
+                            }`}
                     >
                         ⭐ Following
                     </button>
@@ -150,7 +158,7 @@ const Dashboard = () => {
                                 <div className="text-6xl mb-4">📚</div>
                                 <h2 className="text-2xl font-bold text-gray-800 mb-2">No blogs yet</h2>
                                 <p className="text-gray-600 mb-6">Start sharing your thoughts with the world!</p>
-                                <Link 
+                                <Link
                                     to="/create"
                                     className="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg transition transform hover:scale-105"
                                 >
@@ -171,18 +179,21 @@ const Dashboard = () => {
                                             </div>
                                         </div>
                                         <div className="flex gap-3 justify-end">
-                                            <Link 
+                                            <Link
                                                 to={`/edit/${blog._id}`}
                                                 className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition"
                                             >
                                                 ✏️ Edit
                                             </Link>
-                                            <button 
+                                            <button
                                                 onClick={() => handleDelete(blog._id)}
                                                 disabled={deleteLoading === blog._id}
                                                 className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition"
                                             >
                                                 {deleteLoading === blog._id ? '⏳ Deleting...' : '🗑️ Delete'}
+                                            </button>
+                                            <button onClick={() => handleLiked(blog._id)}>
+                                                🤍 {blog.likesCount || 0}
                                             </button>
                                         </div>
                                     </div>

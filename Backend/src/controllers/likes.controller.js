@@ -7,10 +7,21 @@ async function likeBlog(req, res) {
         const userId = req.user._id
 
         const blogExists = await blogModel.findById(blogId)
-
         if (!blogExists) {
             return res.status(404).json({
                 message: "Blog not found"
+            })
+        }
+
+        // ✅ Check if already liked
+        const alreadyLiked = await LikeModel.findOne({ 
+            blog: blogId, 
+            user: userId 
+        })
+
+        if(alreadyLiked){
+            return res.status(409).json({
+                message: "Already liked"
             })
         }
 

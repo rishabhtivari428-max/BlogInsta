@@ -6,7 +6,7 @@ export const AuthContext = createContext()
 
 export function AuthProvider({ children }){
     const [user, setuser] = useState(null)
-    const [loading, setloading] = useState(false)
+    const [loading, setloading] = useState(true)
 
     const handleLogin = async(username, email, password) => {
         setloading(true)
@@ -62,6 +62,9 @@ export function AuthProvider({ children }){
             if (err.response?.status !== 401) {
                 console.log("Error fetching user:", err);
             }
+        }
+        finally{
+            setloading(false)
         }
     }
 
