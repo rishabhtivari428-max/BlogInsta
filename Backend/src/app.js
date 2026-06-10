@@ -8,7 +8,7 @@ const app = express()
 app.use(express.json())
 app.use(cookieparser())
 app.use(cors({
-    origin: ["http://localhost:5173", "https://your-frontend-url.vercel.app"],
+    origin: ["http://localhost:5173", "https://bloginstaa.netlify.app"],
     credentials: true
 }))
 
